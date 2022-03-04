@@ -48,13 +48,13 @@ class DebugVectAdvertiser : public rclcpp::Node
 public:
 	DebugVectAdvertiser() : Node("debug_vect_advertiser") {
 #ifdef ROS_DEFAULT_API
-		publisher_ = this->create_publisher<px4_msgs::msg::DebugVect>("fmu/debug_vect/in", 10);
+		publisher_ = this->create_publisher<px4_msgs::msg::debug_vect>("fmu/debug_vect/in", 10);
 #else
-		publisher_ = this->create_publisher<px4_msgs::msg::DebugVect>("fmu/debug_vect/in");
+		publisher_ = this->create_publisher<px4_msgs::msg::debug_vect>("fmu/debug_vect/in");
 #endif
 		auto timer_callback =
 		[this]()->void {
-			auto debug_vect = px4_msgs::msg::DebugVect();
+			auto debug_vect = px4_msgs::msg::debug_vect();
 			debug_vect.timestamp = std::chrono::time_point_cast<std::chrono::microseconds>(std::chrono::steady_clock::now()).time_since_epoch().count();
 			std::string name = "test";
 			std::copy(name.begin(), name.end(), debug_vect.name.begin());
@@ -70,7 +70,7 @@ public:
 
 private:
 	rclcpp::TimerBase::SharedPtr timer_;
-	rclcpp::Publisher<px4_msgs::msg::DebugVect>::SharedPtr publisher_;
+	rclcpp::Publisher<px4_msgs::msg::debug_vect>::SharedPtr publisher_;
 };
 
 int main(int argc, char *argv[])

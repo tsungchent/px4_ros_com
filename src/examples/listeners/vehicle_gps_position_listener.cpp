@@ -47,12 +47,12 @@ class VehicleGpsPositionListener : public rclcpp::Node
 {
 public:
 	explicit VehicleGpsPositionListener() : Node("vehicle_global_position_listener") {
-		subscription_ = this->create_subscription<px4_msgs::msg::VehicleGpsPosition>(
+		subscription_ = this->create_subscription<px4_msgs::msg::vehicle_gps_position>(
 			"fmu/vehicle_gps_position/out",
 #ifdef ROS_DEFAULT_API
             10,
 #endif
-			[this](const px4_msgs::msg::VehicleGpsPosition::UniquePtr msg) {
+			[this](const px4_msgs::msg::vehicle_gps_position::UniquePtr msg) {
 			std::cout << "\n\n\n\n\n\n\n\n\n\n";
 			std::cout << "RECEIVED VEHICLE GPS POSITION DATA"   << std::endl;
 			std::cout << "=================================="   << std::endl;
@@ -84,7 +84,7 @@ public:
 	}
 
 private:
-	rclcpp::Subscription<px4_msgs::msg::VehicleGpsPosition>::SharedPtr subscription_;
+	rclcpp::Subscription<px4_msgs::msg::vehicle_gps_position>::SharedPtr subscription_;
 };
 
 int main(int argc, char *argv[])

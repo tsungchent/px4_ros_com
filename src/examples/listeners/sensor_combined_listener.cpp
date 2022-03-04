@@ -49,12 +49,12 @@ class SensorCombinedListener : public rclcpp::Node
 {
 public:
 	explicit SensorCombinedListener() : Node("sensor_combined_listener") {
-		subscription_ = this->create_subscription<px4_msgs::msg::SensorCombined>(
+		subscription_ = this->create_subscription<px4_msgs::msg::sensor_combined>(
 			"fmu/sensor_combined/out",
 #ifdef ROS_DEFAULT_API
             10,
 #endif
-			[this](const px4_msgs::msg::SensorCombined::UniquePtr msg) {
+			[this](const px4_msgs::msg::sensor_combined::UniquePtr msg) {
 			std::cout << "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n";
 			std::cout << "RECEIVED SENSOR COMBINED DATA"   << std::endl;
 			std::cout << "============================="   << std::endl;
@@ -72,7 +72,7 @@ public:
 	}
 
 private:
-	rclcpp::Subscription<px4_msgs::msg::SensorCombined>::SharedPtr subscription_;
+	rclcpp::Subscription<px4_msgs::msg::sensor_combined>::SharedPtr subscription_;
 };
 
 int main(int argc, char *argv[])

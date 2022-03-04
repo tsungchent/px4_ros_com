@@ -37,10 +37,10 @@
  * @author Mickey Cowden <info@cowden.tech>
  * @author Nuno Marques <nuno.marques@dronesolutions.io>
 
- * The TrajectorySetpoint message and the OFFBOARD mode in general are under an ongoing update.
+ * The trajectory_setpoint message and the OFFBOARD mode in general are under an ongoing update.
  * Please refer to PR: https://github.com/PX4/PX4-Autopilot/pull/16739 for more info. 
  * As per PR: https://github.com/PX4/PX4-Autopilot/pull/17094, the format
- * of the TrajectorySetpoint message shall change.
+ * of the trajectory_setpoint message shall change.
  */
 
 #include <px4_msgs/msg/offboard_control_mode.hpp>
@@ -63,24 +63,24 @@ public:
 	OffboardControl() : Node("offboard_control") {
 #ifdef ROS_DEFAULT_API
 		offboard_control_mode_publisher_ =
-			this->create_publisher<OffboardControlMode>("fmu/offboard_control_mode/in", 10);
+			this->create_publisher<offboard_control_mode>("fmu/offboard_control_mode/in", 10);
 		trajectory_setpoint_publisher_ =
-			this->create_publisher<TrajectorySetpoint>("fmu/trajectory_setpoint/in", 10);
+			this->create_publisher<trajectory_setpoint>("fmu/trajectory_setpoint/in", 10);
 		vehicle_command_publisher_ =
-			this->create_publisher<VehicleCommand>("fmu/vehicle_command/in", 10);
+			this->create_publisher<vehicle_command>("fmu/vehicle_command/in", 10);
 #else
 		offboard_control_mode_publisher_ =
-			this->create_publisher<OffboardControlMode>("fmu/offboard_control_mode/in");
+			this->create_publisher<offboard_control_mode>("fmu/offboard_control_mode/in");
 		trajectory_setpoint_publisher_ =
-			this->create_publisher<TrajectorySetpoint>("fmu/trajectory_setpoint/in");
+			this->create_publisher<trajectory_setpoint>("fmu/trajectory_setpoint/in");
 		vehicle_command_publisher_ =
-			this->create_publisher<VehicleCommand>("fmu/vehicle_command/in");
+			this->create_publisher<vehicle_command>("fmu/vehicle_command/in");
 #endif
 
 		// get common timestamp
 		timesync_sub_ =
-			this->create_subscription<px4_msgs::msg::Timesync>("fmu/timesync/out", 10,
-				[this](const px4_msgs::msg::Timesync::UniquePtr msg) {
+			this->create_subscription<px4_msgs::msg::timesync>("fmu/timesync/out", 10,
+				[this](const px4_msgs::msg::timesync::UniquePtr msg) {
 					timestamp_.store(msg->timestamp);
 				});
 
@@ -90,7 +90,7 @@ public:
 
 			if (offboard_setpoint_counter_ == 10) {
 				// Change to Offboard mode after 10 setpoints
-				this->publish_vehicle_command(VehicleCommand::VEHICLE_CMD_DO_SET_MODE, 1, 6);
+				this->publish_vehicle_command(vehicle_command::VEHICLE_CMD_DO_SET_MODE, 1, 6);
 
 				// Arm the vehicle
 				this->arm();
@@ -114,10 +114,10 @@ public:
 private:
 	rclcpp::TimerBase::SharedPtr timer_;
 
-	rclcpp::Publisher<OffboardControlMode>::SharedPtr offboard_control_mode_publisher_;
-	rclcpp::Publisher<TrajectorySetpoint>::SharedPtr trajectory_setpoint_publisher_;
-	rclcpp::Publisher<VehicleCommand>::SharedPtr vehicle_command_publisher_;
-	rclcpp::Subscription<px4_msgs::msg::Timesync>::SharedPtr timesync_sub_;
+	rclcpp::Publisher<offboard_control_mode>::SharedPtr offboard_control_mode_publisher_;
+	rclcpp::Publisher<trajectory_setpoint>::SharedPtr trajectory_setpoint_publisher_;
+	rclcpp::Publisher<vehicle_command>::SharedPtr vehicle_command_publisher_;
+	rclcpp::Subscription<px4_msgs::msg::timesync>::SharedPtr timesync_sub_;
 
 	std::atomic<uint64_t> timestamp_;   //!< common synced timestamped
 
@@ -133,7 +133,7 @@ private:
  * @brief Send a command to Arm the vehicle
  */
 void OffboardControl::arm() const {
-	publish_vehicle_command(VehicleCommand::VEHICLE_CMD_COMPONENT_ARM_DISARM, 1.0);
+	publish_vehicle_command(vehicle_command::VEHICLE_CMD_COMPONENT_ARM_DISARM, 1.0);
 
 	RCLCPP_INFO(this->get_logger(), "Arm command send");
 }
@@ -142,7 +142,7 @@ void OffboardControl::arm() const {
  * @brief Send a command to Disarm the vehicle
  */
 void OffboardControl::disarm() const {
-	publish_vehicle_command(VehicleCommand::VEHICLE_CMD_COMPONENT_ARM_DISARM, 0.0);
+	publish_vehicle_command(vehicle_command::VEHICLE_CMD_COMPONENT_ARM_DISARM, 0.0);
 
 	RCLCPP_INFO(this->get_logger(), "Disarm command send");
 }
@@ -152,7 +152,7 @@ void OffboardControl::disarm() const {
  *        For this example, only position and altitude controls are active.
  */
 void OffboardControl::publish_offboard_control_mode() const {
-	OffboardControlMode msg{};
+	offboard_control_mode msg{};
 	msg.timestamp = timestamp_.load();
 	msg.position = true;
 	msg.velocity = false;
@@ -170,7 +170,7 @@ void OffboardControl::publish_offboard_control_mode() const {
  *        vehicle hover at 5 meters with a yaw angle of 180 degrees.
  */
 void OffboardControl::publish_trajectory_setpoint() const {
-	TrajectorySetpoint msg{};
+	trajectory_setpoint msg{};
 	msg.timestamp = timestamp_.load();
 	msg.x = 0.0;
 	msg.y = 0.0;
@@ -182,13 +182,13 @@ void OffboardControl::publish_trajectory_setpoint() const {
 
 /**
  * @brief Publish vehicle commands
- * @param command   Command code (matches VehicleCommand and MAVLink MAV_CMD codes)
+ * @param command   Command code (matches vehicle_command and MAVLink MAV_CMD codes)
  * @param param1    Command parameter 1
  * @param param2    Command parameter 2
  */
 void OffboardControl::publish_vehicle_command(uint16_t command, float param1,
 					      float param2) const {
-	VehicleCommand msg{};
+	vehicle_command msg{};
 	msg.timestamp = timestamp_.load();
 	msg.param1 = param1;
 	msg.param2 = param2;
